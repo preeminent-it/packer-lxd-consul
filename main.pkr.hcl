@@ -1,27 +1,3 @@
-// Variables
-variable "source" {
-  type = map(string)
-  default = {
-    description = "Hashicorp Consul - Ubuntu 20.04"
-    image       = "base-ubuntu-focal"
-    name        = "consul-ubuntu-focal"
-  }
-}
-
-variable "consul_home" {
-  type    = string
-  default = "/opt/consul"
-}
-
-variable "consul_user" {
-  type    = string
-  default = "consul"
-}
-
-locals {
-  timestamp = regex_replace(timestamp(), "[- TZ:]", "")
-}
-
 // Image
 source "lxd" "main" {
   image        = "${var.source.image}"
@@ -35,17 +11,10 @@ source "lxd" "main" {
 build {
   sources = ["source.lxd.main"]
 
-  // Create self-signed certificate
-  provisioner "shell" {
-    inline = [
-      "openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 -nodes -keyout /etc/consul/tls/server.key -out /etc/consul/tls/server.crt -subj \"/CN=consul\""
-    ]
-  }
-
   // Add Consul config
   provisioner "file" {
-    source      = "files/etc/consul/consul.hcl"
-    destination = "/etc/consul/consul.hcl"
+    source      = "files/etc/consul"
+    destination = "/etc/"
   }
 
   // Add Consul service
@@ -61,4 +30,11 @@ build {
       "systemctl enable consul"
     ]
   }
+
+  // Defaults for Consul Template
+  provisioner "file" {
+    source      = "files/etc/default/consul-template"
+    destination = "/etc/default/consul-template"
+  }
+
 }

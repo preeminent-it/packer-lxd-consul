@@ -31,10 +31,10 @@ build {
     ]
   }
 
-  // Defaults for Consul Template
+  // Consul Template templates
   provisioner "file" {
-    source      = "files/etc/default/consul-template"
-    destination = "/etc/default/consul-template"
+    source      = "files/etc/consul-template/templates/consul.hcl.ctmpl"
+    destination = "/etc/consul-template/templates/consul.hcl.ctmpl"
   }
 
 }
